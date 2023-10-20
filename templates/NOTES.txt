@@ -1,0 +1,64 @@
+** Please be patient while the chart is being deployed **
+
+OpenLDAP has been installed. You can access the server from within the k8s cluster using:
+
+  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ldapPort }}
+
+  Or, via SSL/TLS at:
+
+  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.sslLdapPort }}
+
+
+You can access the LDAP adminPassword and configPassword using:
+
+  kubectl get secret --namespace {{ .Release.Namespace }} {{ template "openldap.secretName" . }} -o jsonpath="{.data.LDAP_ADMIN_PASSWORD}" | base64 --decode; echo
+  kubectl get secret --namespace {{ .Release.Namespace }} {{ template "openldap.secretName" . }} -o jsonpath="{.data.LDAP_CONFIG_ADMIN_PASSWORD}" | base64 --decode; echo
+
+
+You can access the LDAP service, from within the cluster (or with kubectl port-forward) with a command like (replace password and domain):
+  ldapsearch -x -H ldap://{{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ldapPort }} -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
+
+
+{{- if .Values.phpldapadmin.enabled }}
+
+You can access PHPLdapAdmin, using
+{{- if .Values.phpldapadmin.ingress.enabled }}
+  {{- range $host := .Values.phpldapadmin.ingress.hosts }}
+     - http://{{ $host }}
+  {{- end }}
+{{- else if contains "NodePort" .Values.phpldapadmin.service.type }}
+  Get the NodePort using :
+  kubectl get --namespace {{ .Release.Namespace }} svc
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  http://$NODE_IP:<NodePort>/
+{{- end }}
+  or kubectl port-forward --namespace {{ .Release.Namespace }} service/openldap-phpldapadmin 8180:80
+  and open http://localhost:8180
+{{- end }}
+
+
+{{- if index .Values "ltb-passwd" "enabled" }}
+
+You can access Self Service Password, using
+{{- if index .Values "ltb-passwd" "ingress" "enabled" }}
+  {{- range $host := index .Values "ltb-passwd" "ingress" "hosts" }}
+     - http://{{ $host }}
+  {{- end }}
+{{- else if contains "NodePort" (index .Values "ltb-passwd" "service" "type") }}
+  Get the NodePort using :
+  kubectl get --namespace {{ .Release.Namespace }} svc
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  http://$NODE_IP:<NodePort>/
+{{- end }}
+  or
+  kubectl port-forward --namespace {{ .Release.Namespace }} service/openldap-ltb-passwd 8280:80
+  and open http://localhost:8280
+  to use change your password stored in the LDAP directory.
+{{- end }}
+
+Test server health using Helm test:
+  helm test {{ .Release.Name }}
+
+Support available from Symas, email support@symas.com or file a bug against this repository.
+
+Enjoy :)

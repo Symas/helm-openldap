@@ -1,0 +1,6 @@
+myValues.yaml
+ignore/*
+ignore
+.DS_Store
+shell.nix
+*~

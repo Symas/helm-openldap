@@ -11,7 +11,7 @@ To install the chart with the release name `my-release`:
 
 ```bash
 $ helm repo add helm-openldap https://symas.github.io/helm-openldap/
-$ helm install my-release helm-openldap/charts/openldap
+$ helm install my-release helm-openldap/openldap
 ```
 
 ## What's here?

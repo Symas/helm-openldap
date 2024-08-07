@@ -561,27 +561,3 @@ ltb-passwd:
     # bindDN: "cn=....,dc=mydomain,dc=com"
     # if you want to use a specific key of the credentials secret instead of the default one (LDAP_ADMIN_PASSWORD)
     # passKey: LDAP_MY_KEY
-
-## phpldapadmin
-## For more parameters check following file: ./charts/phpldapadmin/values.yaml
-phpldapadmin:
-  enabled: true
-  image:
-    tag: 0.9.0
-  env:
-    PHPLDAPADMIN_LDAP_CLIENT_TLS_REQCERT: "never"
-  ingress:
-    enabled: true
-    annotations: {}
-    ## See https://kubernetes.io/docs/concepts/services-networking/ingress/#ingressclass-scope
-    # ingressClassName: nginx
-    path: /
-    pathType: Prefix
-    ## Ingress Host
-    hosts:
-    - phpldapadmin.example
-    ## Ingress cert
-    tls: []
-    # - secretName: phpldapadmin.example
-    #   hosts:
-    #   - phpldapadmin.example

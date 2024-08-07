@@ -26,12 +26,6 @@ ltb-passwd:
   ingress:
     hosts:
     - "ssl-ldap2.example"
-phpldapadmin:
-  enabled: false
-  readinessProbe:
-    enabled: false
-  livenessProbe:
-    enabled: false
 service:
   enableLdapPort: false
   sslLdapPortNodePort: 30636

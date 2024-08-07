@@ -40,11 +40,6 @@ jobs:
     #       responses=$(grep "numResponses" /tmp/test-write.txt | cut -d ":" -f 2 | tr -d ' ')
     #       [ $responses -lt 2 ] || exit 1
     #       grep -q "uid=test1,ou=People,dc=example,dc=org" /tmp/test-write.txt || exit 1
-    - name: Test PhpLdapAdmin access
-      shell: bash
-      run: |
-          echo "127.0.0.1 phpldapadmin.example ssl-ldap2.example" | sudo tee -a /etc/hosts
-          curl phpldapadmin.example:8080
     - name: Validate self service pwd access
       shell: bash
       run: |

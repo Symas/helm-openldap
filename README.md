@@ -70,7 +70,6 @@ A default tree (Root Organization, users and group) is created during startup, t
 This chart will:
 
 * Create 3 instances of OpenLDAP server with multi-master replication.
-* Install and configure a single pod running [phpldapadmin](https://github.com/leenooks/phpLDAPadmin) using the [Osixia container](https://github.com/osixia/docker-phpLDAPadmin), an admin web-GUI for OpenLDAP.
 * Install and configure [ltb-passwd](https://ltb-project.org/documentation/self-service-password.html) using the [Tired of It container](https://github.com/tiredofit/docker-self-service-password) for self-service password changes.
 
 ## Symas Packaged OpenLDAP
@@ -130,18 +129,6 @@ Parameters related to the configuration of the application.
 | `replication.interval`             | Interval for replication | `00:00:00:10` |
 | `replication.clusterName`          | Set the clustername for replication | "cluster.local" |
 
-### PHPLdapAdmin Configuration
-
-Parameters related to [PHPLdapAdmin](https://github.com/leenooks/phpLDAPadmin)
-
-| Parameter                          | Description                                                                                                                               | Default             |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| `phpldapadmin.enabled`             | Enable the deployment of PhpLdapAdmin | `true`|
-| `phpldapadmin.ingress`             | Ingress of Phpldapadmin | `{}` |
-| `phpldapadmin.env`  | Environment variables for PhpldapAdmin| `{PHPLDAPADMIN_LDAP_CLIENT_TLS_REQCERT: "never"}` |
-
-For more advance configuration see [README.md](./advanced_examples/README.md)
-For all possible chart parameters see chart's [README.md](./charts/phpldapadmin/README.md)
 
 ### Self-service Password Configuration
 
@@ -222,31 +209,6 @@ $ helm install --name my-release -f values.yaml stable/openldap
 > **Tip**: You can use the default [values.yaml](values.yaml) or customize it as
 > you require
 
-
-## PhpLdapAdmin
-
-To enable [PhpLdapAdmin](https://github.com/leenooks/phpLDAPadmin) set
-`phpldapadmin.enabled`  to `true` (which is the default).
-
-Configure ingress to expose the service. Setup the env part of the configuration
-to access the OpenLDAP server.
-
-> **Note** : The OpenLDAP host should match the following `namespace.Appfullname`
-
-```
-phpldapadmin:
-  enabled: true
-  ingress:
-    enabled: true
-    annotations: {}
-    # When using NGiNX (ingress-nginx)
-    ingressClassName: nginx
-    path: /
-    ## Ingress Host
-    hosts:
-    - phpldapadmin.local
-  env:
-    PHPLDAPADMIN_LDAP_CLIENT_TLS_REQCERT: "never"
 
 ```
 ## Self-service-password

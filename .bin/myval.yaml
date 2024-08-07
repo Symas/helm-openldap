@@ -20,10 +20,6 @@ ltb-passwd:
   ingress:
     hosts:
     - "ssl-ldap2.example"
-phpldapadmin:
-  ingress:
-    hosts:
-    - "phpldapadmin.example"
 customSchemaFiles:
   00-memberof.ldif: |-
     # Load memberof module

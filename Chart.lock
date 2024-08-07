@@ -2,9 +2,6 @@ dependencies:
 - name: ltb-passwd
   repository: ""
   version: 0.1.x
-- name: phpldapadmin
-  repository: ""
-  version: 0.1.x
 - name: common
   repository: https://charts.bitnami.com/bitnami
   version: 2.20.3

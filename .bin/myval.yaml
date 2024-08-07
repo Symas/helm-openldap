@@ -11,19 +11,37 @@ env:
 # LDAP_LOGLEVEL: "-1"
  SYMAS_DEBUG: "true"
  SYMAS_DEBUG_SETUP: "false"
+image:
+  # From repository https://hub.docker.com/r/symas/openldap/
+  repository: symas/openldap
+#  repository: localhost:5001/openldap
+  tag: 2.6.8
+#  tag: test
+  pullPolicy: Always
 resources:
   limits:
     cpu: "128m"
     memory: "64Mi"
 replicaCount: 3
 ltb-passwd:
+  enabled: true
   ingress:
     hosts:
     - "ssl-ldap2.example"
 phpldapadmin:
+  enabled: false
+  readinessProbe:
+    enabled: false
+  livenessProbe:
+    enabled: false
   ingress:
     hosts:
     - "phpldapadmin.example"
+ldap-ui:
+  enabled: false
+  ingress:
+    hosts:
+    - "ldap-ui.example"
 customSchemaFiles:
   00-memberof.ldif: |-
     # Load memberof module

@@ -242,7 +242,7 @@ Return the server name
 {{- end -}}
 
 {{/*
-Return the bdmin indDN
+Return the admin bindDN
 */}}
 {{- define "global.bindDN" -}}
 {{- printf "cn=%s,%s" .Values.global.adminUser (include "global.baseDomain" .) -}}

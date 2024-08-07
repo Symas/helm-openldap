@@ -122,26 +122,53 @@ EOF
 
 fi
 
-if ! kubectl get namespace | grep -q projectcontour; then
-    info "Installing Contour ingress controller with Envoy"
-    # https://tanzu.vmware.com/developer/guides/service-routing-contour-refarch/
-    kubectl apply -f https://projectcontour.io/quickstart/contour.yaml
-    # https://kind.sigs.k8s.io/docs/user/ingress/
-    kubectl patch daemonsets -n projectcontour envoy -p '{"spec":{"template":{"spec":{"nodeSelector":{"ingress-ready":"true"}}}}}'
-    info "waiting for resource deployment to finish..."
-    kubectl --namespace projectcontour rollout status deployments
-fi
+for arg in "$@"; do
+    if [[ "$arg" == "--envoy" ]]; then
+	if ! kubectl get namespace | grep -q projectcontour; then
+	    info "Installing Contour ingress controller with Envoy"
+	    # https://tanzu.vmware.com/developer/guides/service-routing-contour-refarch/
+	    kubectl apply -f https://projectcontour.io/quickstart/contour.yaml
+	    # https://kind.sigs.k8s.io/docs/user/ingress/
+	    kubectl patch daemonsets -n projectcontour envoy -p '{"spec":{"template":{"spec":{"nodeSelector":{"ingress-ready":"true"}}}}}'
+	    info "waiting for resource deployment to finish..."
+	    kubectl --namespace projectcontour rollout status deployments
+	fi
+	break
+    fi
+done
 
-if ! kubectl get namespace | grep -q chaos-mesh; then
-    # see: https://chaos-mesh.org/
-    helm repo add chaos-mesh https://charts.chaos-mesh.org
-    kubectl create ns chaos-mesh
-    helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/k3s/containerd/containerd.sock --version 2.6.3
+for arg in "$@"; do
+    if [[ "$arg" == "--chaos" ]]; then
+	if ! kubectl get namespace | grep -q chaos-mesh; then
+	    # see: https://chaos-mesh.org/
+	    helm repo add chaos-mesh https://charts.chaos-mesh.org
+	    kubectl create ns chaos-mesh
+	    helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/k3s/containerd/containerd.sock --version 2.6.3
 
-    info "waiting for resource deployment to finish..."
-    kubectl --namespace chaos-mesh rollout status deployments
-    kubectl --namespace chaos-mesh get po
-fi
+	    info "waiting for resource deployment to finish..."
+	    kubectl --namespace chaos-mesh rollout status deployments
+	    kubectl --namespace chaos-mesh get po
+	fi
+	break
+    fi
+done
+
+for arg in "$@"; do
+    if [[ "$arg" == "--dash" ]]; then
+	if ! kubectl get namespace | grep -q kubernetes-dashboard; then
+	    helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+	    helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+	    # Check the services in Kubernetes Dashboard namespace using:
+            #  kubectl -n kubernetes-dashboard get svc
+	    #  kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+	    #  https://localhost:8443
+	    # or
+	    #  kubectl proxy --port=8001
+	    #  http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard-kong-proxy:443/proxy/
+	fi
+    fi
+    break
+done
 
 if kubectl get namespace | grep -q "${NAMESPACE}"; then
     if helm list --namespace ${NAMESPACE} --no-headers --short | grep -q openldap; then
@@ -153,10 +180,12 @@ if kubectl get namespace | grep -q "${NAMESPACE}"; then
     info "Removing namespace ${NAMESPACE}"
     kubectl delete namespace ${NAMESPACE}
 fi
+
+info "Deleting finished jobs in all namespaces"
+kubectl delete jobs --all-namespaces --field-selector status.successful=1
+
 info "Creating ${NAMESPACE} namespace"
 kubectl create namespace ${NAMESPACE}
-
-#kubectl delete jobs --all-namespaces --field-selector status.successful=1
 
 if ! kubectl --namespace ${NAMESPACE} get secret myval-certs > /dev/null 2>&1; then
     if [ -f "${CERT_DIR}/tls.crt" ] && [ -f "${CERT_DIR}/tls.key" ] && [ -f "${CERT_DIR}/ca.crt" ]
@@ -177,8 +206,6 @@ fi
 if ! helm --namespace "${NAMESPACE}" list | grep -q openldap; then
     info "Install openldap chart with 'myval.yaml' testing config"
     helm install --namespace "${NAMESPACE}" --values .bin/myval.yaml openldap .
-    #kubectl --namespace ds create secret generic my-super-secret --from-literal=LDAP_ADMIN_PASSWORD=Not@SecurePassw0rd --from-literal=LDAP_CONFIG_ADMIN_PASSWORD=Not@SecurePassw0rd
-    #helm install --namespace "${NAMESPACE}" --values .bin/singleNode.yaml openldap .
     info "waiting for helm deployment to finish..."
      kubectl --namespace ${NAMESPACE} get events --watch &
      ( kubectl --namespace ${NAMESPACE} wait --for=condition=Ready --timeout=30s pod/openldap-0 || \

@@ -19,7 +19,7 @@ You can access the LDAP service, from within the cluster (or with kubectl port-f
   ldapsearch -x -H ldap://{{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ldapPort }} -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
 
 
-{{- if .Values.phpldapadmin.enabled }}
+{{- if index .Values "phpldapadmin" "enabled" }}
 
 You can access PHPLdapAdmin, using
 {{- if .Values.phpldapadmin.ingress.enabled }}
@@ -37,6 +37,23 @@ You can access PHPLdapAdmin, using
   and open http://localhost:8180
 {{- end }}
 
+{{- if index .Values "ldap-ui" "enabled" }}
+
+You can access ldap-ui, using
+{{- if index .Values "ldap-ui" "ingress" "enabled" }}
+  {{- range $host := index .Values "ldap-ui" "ingress" "hosts" }}
+     - http://{{ $host }}
+  {{- end }}
+{{- else if contains "NodePort" index .Values "ldap-ui" "service" "type" }}
+  Get the NodePort using :
+  kubectl get --namespace {{ .Release.Namespace }} svc
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  http://$NODE_IP:<NodePort>/
+{{- end }}
+  or
+    kubectl port-forward --namespace {{ .Release.Namespace }} service/openldap-ldap-ui 8085:5000
+  and open http://localhost:8185
+{{- end }}
 
 {{- if index .Values "ltb-passwd" "enabled" }}
 

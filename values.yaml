@@ -585,3 +585,26 @@ phpldapadmin:
     # - secretName: phpldapadmin.example
     #   hosts:
     #   - phpldapadmin.example
+## ldap-ui
+## For more parameters check following file: ./charts/ldap-ui/values.yaml
+ldap-ui:
+  enabled: false
+  image:
+    tag: latest
+  env:
+    INSECURE_TLS: true
+  ingress:
+    enabled: true
+    annotations: {}
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingressclass-scope
+    # ingressClassName: nginx
+    path: /
+    pathType: Prefix
+    ## Ingress Host
+    hosts:
+    - ldap-ui.example
+    ## Ingress cert
+    tls: []
+    # - secretName: ldap-ui.example
+    #   hosts:
+    #   - ldap-ui.example

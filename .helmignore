@@ -27,4 +27,3 @@ advanced_examples
 flake.nix
 flake.lock
 shell.nix
-

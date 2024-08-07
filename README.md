@@ -70,8 +70,18 @@ A default tree (Root Organization, users and group) is created during startup, t
 This chart will:
 
 * Create 3 instances of OpenLDAP server with multi-master replication.
-* Install and configure a single pod running [phpldapadmin](https://github.com/leenooks/phpLDAPadmin) using the [Osixia container](https://github.com/osixia/docker-phpLDAPadmin), an admin web-GUI for OpenLDAP.
-* Install and configure [ltb-passwd](https://ltb-project.org/documentation/self-service-password.html) using the [Tired of It container](https://github.com/tiredofit/docker-self-service-password) for self-service password changes.
+* Optionally install and configure a single pod running
+  [ldap-ui](https://github.com/dnknth/ldap-ui), a simple admin web-GUI for
+  OpenLDAP.
+* Optionally install and configure a single pod running
+  [phpldapadmin](https://github.com/leenooks/phpLDAPadmin) using the
+  [Osixia container](https://github.com/osixia/docker-phpLDAPadmin), an admin
+  web-GUI for OpenLDAP.
+* Install and configure
+  [ltb-passwd](https://ltb-project.org/documentation/self-service-password.html)
+  using the [Tired of It
+  container](https://github.com/tiredofit/docker-self-service-password)
+  for self-service password changes.
 
 ## Symas Packaged OpenLDAP
 
@@ -129,6 +139,19 @@ Parameters related to the configuration of the application.
 | `replication.tls_reqcert`              | TLS certificate validation for replication | `never` |
 | `replication.interval`             | Interval for replication | `00:00:00:10` |
 | `replication.clusterName`          | Set the clustername for replication | "cluster.local" |
+
+### LDAP-ui Configuration
+
+Parameters related to [Ldap-Ui](https://github.com/leenooks/ldap-ui)
+
+| Parameter                          | Description                                                                                                                               | Default             |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| `ldap-ui.enabled`             | Enable the deployment of Ldap-Ui | `true`|
+| `ldap-ui.ingress`             | Ingress of Ldap-Ui | `{}` |
+| `ldap-ui.env`  | Environment variables for Ldap-Ui| `{LDAP-UI_LDAP_CLIENT_TLS_REQCERT: "never"}` |
+
+For more advance configuration see [README.md](./advanced_examples/README.md)
+For all possible chart parameters see chart's [README.md](./charts/ldap-ui/README.md)
 
 ### PHPLdapAdmin Configuration
 

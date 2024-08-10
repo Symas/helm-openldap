@@ -258,12 +258,26 @@ Return the ldap port
 {{- end -}}
 
 {{/*
+Generate certificate names list
+*/}}
+{{- define "openldap-headless-names" -}}
+{{- $name := (include "openldap.fullname" .) }}
+{{- $namespace := .Release.Namespace }}
+{{- $cluster := .Values.replication.clusterName }}
+{{- $nodeCount := .Values.replicaCount | int }}
+  {{- range $index0 := until $nodeCount }}
+    {{- $index1 := $index0 | add1 }} {{ $name }}-{{ $index0 }}.{{ $name }}-headless.{{ $namespace }}.svc.{{ $cluster }}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Generate certificates for the openldap server
 */}}
 {{- define "openldap.gen-certs" -}}
-{{- $altNames := list ( include "openldap.fullname" . ) ( printf "%s.%s" (include "openldap.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "openldap.fullname" .) .Release.Namespace ) -}}
+{{- $altNames := list ( include "openldap.fullname" . ) ( printf "%s.%s" (include "openldap.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "openldap.fullname" .) .Release.Namespace ) ( include "openldap-headless-names" . ) -}}
+{{- $caName := printf "%s.%s.svc.%s" (include "openldap.fullname" .) .Release.Namespace .Values.replication.clusterName -}}
 {{- $ca := genCA "openldap-ca" 365 -}}
-{{- $cert := genSignedCert .Values.global.ldapDomain nil $altNames 365 $ca -}}
+{{- $cert := genSignedCert $caName nil $altNames 365 $ca -}}
 ca.crt: {{ $cert.Cert | b64enc }}
 tls.crt: {{ $cert.Cert | b64enc }}
 tls.key: {{ $cert.Key | b64enc }}

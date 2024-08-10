@@ -2,11 +2,11 @@
 
 OpenLDAP has been installed. You can access the server from within the k8s cluster using:
 
-  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ldapPort }}
+  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.global.ldapPort }}
 
   Or, via SSL/TLS at:
 
-  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.sslLdapPort }}
+  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.global.sslLdapPort }}
 
 
 You can access the LDAP adminPassword and configPassword using:
@@ -16,7 +16,7 @@ You can access the LDAP adminPassword and configPassword using:
 
 
 You can access the LDAP service, from within the cluster (or with kubectl port-forward) with a command like (replace password and domain):
-  ldapsearch -x -H ldap://{{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.global.ldapPort }} -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
+  ldapsearch -x -H ldap://{{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.global.ldapPort }} -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
 
 
 {{- if .Values.phpldapadmin.enabled }}

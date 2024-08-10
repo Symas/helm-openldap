@@ -21,7 +21,7 @@ ltb-passwd:
     hosts:
     - "ssl-ldap2.example"
 phpldapadmin:
-  enabled: false
+  enabled: true
   ingress:
     hosts:
     - "phpldapadmin.example"

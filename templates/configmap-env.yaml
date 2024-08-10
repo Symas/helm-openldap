@@ -30,9 +30,9 @@ data:
   {{- end }}
   {{- if .Values.initTLSSecret.tls_enabled}}
   LDAP_ENABLE_TLS: "yes"
-  LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/tls.crt
-  LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/tls.key
-  LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/ca.crt
+  LDAP_TLS_CERT_FILE: /certs/tls.crt
+  LDAP_TLS_KEY_FILE: /certs/tls.key
+  LDAP_TLS_CA_FILE: /certs/ca.crt
   {{- else }}
   LDAP_ENABLE_TLS: "no"
   {{- end }}

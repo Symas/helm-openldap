@@ -209,7 +209,7 @@ spec:
             - name: data
               mountPath: /openldap
             - name: certs
-              mountPath: /opt/bitnami/openldap/certs
+              mountPath: /certs
               readOnly: true
             {{- range $file := (include "openldap.replicationConfigFiles" . | split ",") }}
             - name: replication-acls
@@ -280,15 +280,12 @@ spec:
           emptyDir:
             medium: Memory
 {{- end }}
-        - name: certs
-          emptyDir:
-            medium: Memory
 {{- if and ( .Values.initTLSSecret.tls_enabled ) (hasKey .Values.initTLSSecret "secret") (ne .Values.initTLSSecret.secret "") }}
-        - name: secret-certs
+        - name: certs
           secret:
             secretName: {{ .Values.initTLSSecret.secret }}
 {{- else }}
-        - name: secret-certs
+        - name: certs
           emptyDir:
             medium: Memory
 {{- end }}

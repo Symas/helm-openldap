@@ -198,7 +198,7 @@ replication:
   interval: 00:00:00:10
   starttls: "yes"
   tls_reqcert: "allow"
-  tls_cacert: /opt/bitnami/openldap/certs/ca.crt
+  tls_cacert: /certs/ca.crt
 
 ## Persist data to a persistent volume
 persistence:

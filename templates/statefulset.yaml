@@ -86,25 +86,6 @@ spec:
           - secretRef:
               name: {{ template "openldap.secretName" . }}
     {{- end }}
-      {{- if .Values.initContainers }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
-      {{- end }}
-      {{- if .Values.volumePermissions.enabled }}
-        - name: volume-permissions
-          image: {{ include "openldap.volumePermissionsImage" . }}
-          imagePullPolicy: {{ .Values.volumePermissions.image.pullPolicy | quote }}
-          command: {{- include "common.tplvalues.render" (dict "value" .Values.volumePermissions.image.command "context" $) | nindent 12 }}
-          {{- if .Values.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
-          {{- end }}
-          {{- if .Values.volumePermissions.resources }}
-          resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            - mountPath: /bitnami
-              name: data
-      {{- end }}
-
       serviceAccountName: {{ template "openldap.serviceAccountName" . }}
       {{- include "openldap.imagePullSecrets" . | nindent 6 }}
       {{- if .Values.hostAliases }}

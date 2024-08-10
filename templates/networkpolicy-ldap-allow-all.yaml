@@ -1,0 +1,23 @@
+# allows all pods to connect on ldap port
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ template "openldap.fullname" . }}-allow-ldap-ports
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ template "openldap.fullname" . }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: {{ template "openldap.fullname" . }}
+      release: {{ .Release.Name }}
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: ldap-port
+    - protocol: TCP
+      port: ssl-ldap-port
+  - from:
+    - namespaceSelector: {}

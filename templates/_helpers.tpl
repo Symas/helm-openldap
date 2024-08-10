@@ -149,14 +149,6 @@ Return the proper Docker Image Registry Secret Names
 {{ include "common.images.pullSecrets" (dict "images" (list .Values.image ) "global" .Values.global) }}
 {{- end -}}
 
-
-{{/*
-Return the proper OpenLDAP init TLS Secret container image name
-*/}}
-{{- define "openldap.initTLSSecretImage" -}}
-{{- include "common.images.image" (dict "imageRoot" .Values.initTLSSecret.image "global" .Values.global) -}}
-{{- end -}}
-
 {{/*
 Return the proper OpenLDAP init container image name
 */}}
@@ -263,4 +255,16 @@ Return the ldap port
 */}}
 {{- define "global.ldapPort" -}}
 {{- printf "%d" .Values.global.ldapPort  -}}
+{{- end -}}
+
+{{/*
+Generate certificates for the openldap server
+*/}}
+{{- define "openldap.gen-certs" -}}
+{{- $altNames := list ( include "openldap.fullname" . ) ( printf "%s.%s" (include "openldap.fullname" .) .Release.Namespace ) ( printf "%s.%s.svc" (include "openldap.fullname" .) .Release.Namespace ) -}}
+{{- $ca := genCA "openldap-ca" 365 -}}
+{{- $cert := genSignedCert .Values.global.ldapDomain nil $altNames 365 $ca -}}
+ca.crt: {{ $cert.Cert | b64enc }}
+tls.crt: {{ $cert.Cert | b64enc }}
+tls.key: {{ $cert.Key | b64enc }}
 {{- end -}}

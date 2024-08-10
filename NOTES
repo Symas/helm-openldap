@@ -32,14 +32,59 @@ for (( i=1; i<10000; i++ )) ; do openssl s_client  -connect openldap-0.openldap-
 
 
 
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          namespace: {{ .Release.Namespace }}
-      podSelector:
-        matchLabels:
-          app.kubernetes.io/component: {{ template "openldap.fullname" . }}
-          release: {{ .Release.Name }}
+
+        - name: init-schema
+          image: {{ include "openldap.initSchemaImage" . }}
+          imagePullPolicy: {{ .Values.initSchema.image.pullPolicy | quote }}
+          command:
+            - sh
+            - -c
+            - |
+              cp -p -f /cm-schemas-acls/*.ldif /custom-config/
+              if [ -d /cm-schemas ]; then
+                cp -p -f /cm-schemas/*.ldif /custom-schemas/
+              fi
+              if [ -d /cm-ldifs ]; then
+                cp -p -f /cm-ldifs/*.ldif /custom-ldifs/
+              fi
+            {{- if .Values.global.existingSecret }}
+              sed -i -e "s/%%CONFIG_PASSWORD%%/${LDAP_CONFIG_ADMIN_PASSWORD}/g" /custom-config/*
+              sed -i -e "s/%%ADMIN_PASSWORD%%/${LDAP_ADMIN_PASSWORD}/g" /custom-config/*
+            {{- end }}
+          {{- if .Values.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.initTLSSecret.resources }}
+          resources: {{- toYaml .Values.initTLSSecret.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+    {{- if .Values.customSchemaFiles }}
+      {{- range $file := (include "openldap.customSchemaFiles" . | split ",") }}
+            - name: cm-custom-schema-files
+              mountPath: /cm-schemas/{{ $file }}.ldif
+              subPath: {{ $file }}.ldif
+      {{- end }}
+            - name: custom-schema-files
+              mountPath: /custom-schemas/
+    {{- end }}
+    {{- if or (.Values.customLdifFiles) (.Values.customLdifCm) }}
+            - name: cm-custom-ldif-files
+              mountPath: /cm-ldifs/
+            - name: custom-ldif-files
+              mountPath: /custom-ldifs/
+    {{- end }}
+            - name: cm-replication-acls
+              mountPath: /cm-schemas-acls/
+            - name: replication-acls
+              mountPath: /custom-config/
+    {{- if .Values.global.existingSecret }}
+          envFrom:
+          - secretRef:
+              name: {{ template "openldap.secretName" . }}
+    {{- end }}
+      {{- if .Values.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
+      {{- end }}
 
 
 -------------

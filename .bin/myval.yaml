@@ -111,9 +111,4 @@ service:
   type: NodePort
 initTLSSecret:
   tls_enabled: true
-  image:
-    registry: docker.io
-    repository: alpine/openssl
-    tag: latest
-    pullPolicy: IfNotPresent
-  secret: "myval-certs"
+  secret: "myval-tls-certs"

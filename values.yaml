@@ -402,35 +402,9 @@ serviceAccount:
 ##
 initTLSSecret:
   tls_enabled: false
-  ##  openssl image
-  ## @param initTlsSecret.image.registry openssl image registry
-  ## @param initTlsSecret.image.repository openssl image name
-  ## @param initTlsSecret.image.tag openssl image tag
-  ##
-  image:
-    registry: docker.io
-    repository: alpine/openssl
-    tag: latest
-    ## @param image.pullPolicy openssl image pull policy
-    ## Specify a imagePullPolicy
-    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-    ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
-    ##
-    pullPolicy: IfNotPresent
+  tls_gencert: true
   # The name of a kubernetes.io/tls type secret to use for TLS
   secret: ""
-  ## init-tls-secret container's resource requests and limits
-  ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-  ## @param initTlsSecret.resources.limits The resources limits for the init container
-  ## @param initTlsSecret.resources.requests The requested resources for the init container
-  ##
-  resources:
-    ## Example:
-    ## limits:
-    ##   cpu: 500m
-    ##   memory: 1Gi
-    limits: {}
-    requests: {}
 
 ## 'volumePermissions' init container parameters
 ## Changes the owner and group of the persistent volume mount point to runAsUser:fsGroup values

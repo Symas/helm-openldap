@@ -89,32 +89,6 @@ spec:
       {{- if .Values.initContainers }}
         {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
       {{- end }}
-      {{- if .Values.initTLSSecret.tls_enabled}}
-        - name: init-tls-secret
-          image: {{ include "openldap.initTLSSecretImage" . }}
-          imagePullPolicy: {{ .Values.initTLSSecret.image.pullPolicy | quote }}
-          command:
-            - sh
-            - -c
-            - |
-              {{- if and ( .Values.initTLSSecret.tls_enabled ) (hasKey .Values.initTLSSecret "secret") (eq .Values.initTLSSecret.secret "") }}
-              openssl req -x509 -newkey rsa:4096 -nodes -subj '/CN={{ .Values.global.ldapDomain }}' -keyout /tmp-certs/tls.key -out /tmp-certs/tls.crt -days 365
-              chmod 777  /tmp-certs/*
-              {{- end }}
-              cp -Lr /tmp-certs/* /certs
-              [ -e /certs/ca.crt ] || cp -a /certs/tls.crt /certs/ca.crt
-          {{- if .Values.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
-          {{- end }}
-          {{- if .Values.initTLSSecret.resources }}
-          resources: {{- toYaml .Values.initTLSSecret.resources | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            - name: certs
-              mountPath: "/certs"
-            - name: secret-certs
-              mountPath: "/tmp-certs"
-      {{- end }}
       {{- if .Values.volumePermissions.enabled }}
         - name: volume-permissions
           image: {{ include "openldap.volumePermissionsImage" . }}

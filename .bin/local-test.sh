@@ -25,8 +25,11 @@ done
 
 if [[ "$K8S_EMU" == 'minikube' ]];
 then
-    minikube start
+    if ! minikube status | grep -q 'host: Running'; then
+	minikube start
+    fi
 fi
+
 
 if [[ "$K8S_EMU" == 'kind' ]];
 then

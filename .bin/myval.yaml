@@ -113,3 +113,5 @@ service:
 initTLSSecret:
   tls_enabled: true
   secret: "myval-tls-certs"
+replication:
+  tls_enabled: true

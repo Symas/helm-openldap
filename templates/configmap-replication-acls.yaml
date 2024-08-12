@@ -13,14 +13,7 @@ metadata:
 {{- end }}
 data:
   # replication
-  delta-syncrepl.ldif: |
-    # Load delta-syncrepl module
-    dn: cn=module,cn=config
-    cn: module
-    objectClass: olcModuleList
-    olcModuleLoad: delta-syncrepl.so
-    olcModulePath: /opt/bitnami/openldap/lib/openldap
-  syncprov.ldif: |
+  00_syncprov-load.ldif: |
     # Load syncprov module
     dn: cn=module,cn=config
     cn: module
@@ -52,8 +45,19 @@ data:
     changetype: modify
     add: olcMirrorMode
     olcMirrorMode: TRUE
-  # acls
-  04_acls-modify.ldif: |
+  04_syncprov.ldif: |
+    dn: olcOverlay=syncprov,olcDatabase={0}config,cn=config
+    objectClass: olcOverlayConfig
+    objectClass: olcSyncProvConfig
+    olcSpCheckpoint: 100 10
+    olcSpSessionlog: 50000
+  05_syncprov.ldif: |
+    dn: olcOverlay=syncprov,olcDatabase={2}mdb,cn=config
+    objectClass: olcOverlayConfig
+    objectClass: olcSyncProvConfig
+    olcSpCheckpoint: 100 10
+    olcSpSessionlog: 55000000
+  06_acls-modify.ldif: |
 {{- if .Values.customAcls }}
     {{- .Values.customAcls | nindent 4 }}
 {{- else }}

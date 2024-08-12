@@ -196,7 +196,8 @@ replication:
   network_timeout: 0
   keepalive: 240:10:30
   interval: 00:00:00:10
-  starttls: "yes"
+  tls_enabled: true
+  starttls: "no"
   tls_reqcert: "allow"
   tls_cacert: /certs/ca.crt
 

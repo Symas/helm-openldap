@@ -28,6 +28,7 @@ mkShell rec {
     shelldap
     stern
     shellcheck
+    tmate
     lsof
   ];
   shellHook =

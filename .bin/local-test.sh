@@ -14,8 +14,24 @@ set -o pipefail
 
 CERT_DIR=${CERT_DIR:-$(mktemp -d)}
 NAMESPACE=ds
-KIND_CLUSTER_NAME=kind
+	K8S_EMU=kind
 
+for arg in "$@"; do
+    if [[ "$arg" == "--minikube" ]]; then
+	K8S_EMU=minikube
+	break
+    fi
+done
+
+if [[ "$K8S_EMU" == 'minikube' ]];
+then
+    minikube start
+fi
+
+if [[ "$K8S_EMU" == 'kind' ]];
+then
+
+KIND_CLUSTER_NAME=kind
 
 if ! kind get clusters -q | grep -q $KIND_CLUSTER_NAME; then
 
@@ -121,6 +137,9 @@ EOF
 EOF
 
 fi
+fi
+
+kubectl get nodes -v10 || exit 1
 
 for arg in "$@"; do
     if [[ "$arg" == "--envoy" ]]; then

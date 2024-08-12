@@ -266,7 +266,7 @@ Generate certificate names list
 {{- $cluster := .Values.replication.clusterName }}
 {{- $nodeCount := .Values.replicaCount | int }}
   {{- range $index0 := until $nodeCount }}
-    {{- $index1 := $index0 | add1 }} {{ $name }}-{{ $index0 }}.{{ $name }}-headless.{{ $namespace }}.svc.{{ $cluster }}
+    {{- $index1 := $index0 | add1 }} {{ $name }}-{{ $index0 }} {{ $name }}-{{ $index0 }}.{{ $name }}-headless.{{ $namespace }}.svc.{{ $cluster }}
   {{- end -}}
 {{- end -}}
 

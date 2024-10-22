@@ -117,10 +117,10 @@ Generate olcSyncRepl list
     olcSyncrepl:
       rid=00{{ $index1 }}
       provider={{ $protocol }}://{{ $name }}-{{ $index0 }}.{{ $name }}-headless.{{ $namespace }}.svc.{{ $cluster }}:{{ $port }}
-      binddn={{ printf "cn=%s,%s" $bindDNUser $domain }}
+      binddn="{{ printf "cn=%s,%s" $bindDNUser $domain }}"
       bindmethod=simple
       credentials={{ $adminPassword }}
-      searchbase={{ $domain }}
+      searchbase="{{ $domain }}"
       type=refreshAndPersist
       interval={{ $interval }}
       retry="{{ $retry }} +"
